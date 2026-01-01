@@ -5,15 +5,19 @@ Embeddable buttons for Nostr:
 1) **Zap viewer**: open a dialog and **view zap history** for an `npub`, `nprofile`, `note`, `nevent`, or `naddr`.
 2) **Zap button (legacy API)**: zap a profile or note from anywhere.
 
-The package ships a single-file browser bundle **and** an ES module build.
+This project is intended to be embedded via a single-file browser bundle.
 
 ## Quick start (plain HTML)
 
 Add the script tag near the end of your page:
 
 ```html
-<script src="./dist/nostr-zap.js"></script>
+<script src="https://zap.nostr.buzz/dist/nostr-zap.js"></script>
 ```
+
+Live HTML docs (recommended for your domain):
+
+- https://zap.nostr.buzz/docs.html
 
 Then add a “View zaps” button:
 
@@ -50,59 +54,6 @@ These are read from the clicked button:
 - `data-title` (optional): Custom dialog title. If empty/missing, the identifier is used.
 - `data-zap-color-mode` (optional): `"true"` or `"false"`. If missing, defaults to the library’s configured default.
 
-## Using with bundlers (Vite/Webpack/Rollup)
-
-Install:
-
-```sh
-npm i nostr-zap
-```
-
-Then call `initialize()` once after your buttons exist in the DOM:
-
-```js
-import { initialize } from "nostr-zap";
-
-initialize();
-```
-
-### SPA / dynamic DOM
-
-If your buttons appear later (route changes, dialogs, etc.), call `initialize()` again after rendering.
-
-## Svelte example
-
-Buttons are visible on initial render:
-
-```svelte
-<script lang="ts">
-  import { onMount } from "svelte";
-  import { initialize } from "nostr-zap";
-
-  onMount(() => {
-    initialize();
-  });
-</script>
-```
-
-Buttons appear conditionally (after a tick):
-
-```svelte
-<script lang="ts">
-  import { tick } from "svelte";
-  import { initialize } from "nostr-zap";
-
-  export let show = false;
-
-  $: if (show) {
-    (async () => {
-      await tick();
-      initialize();
-    })();
-  }
-</script>
-```
-
 ## Legacy zap button API (still included)
 
 This bundle also includes the older “zap” flow and auto-initializes it.
@@ -118,17 +69,19 @@ Common attributes used by older embeds include:
 
 ### Programmatic legacy API
 
-When using the module build:
+When loaded via a script tag, use the browser global:
 
 ```js
-import { nostrZap, zapInit, zapInitTargets } from "nostr-zap";
+// Low-level API object:
+// window.nostrZap.nostrZap.init({ npub, noteId?, naddr?, relays?, buttonColor?, anon? })
 
-// Low-level API object
-// nostrZap.init({ npub, noteId?, naddr?, relays?, buttonColor?, anon? })
+// Convenience helpers:
+await window.nostrZap.zapInit({
+  npub: "npub1tapj48eekk8lzvhupfxg4ugdgthaj97cqahk3wml97g76l20dfqspmpjyp",
+  relays: "wss://relay.damus.io,wss://nos.lol",
+});
 
-// Convenience exports
-await zapInit({ npub: "npub1tapj48eekk8lzvhupfxg4ugdgthaj97cqahk3wml97g76l20dfqspmpjyp", relays: "wss://relay.damus.io,wss://nos.lol" });
-zapInitTargets();
+window.nostrZap.zapInitTargets();
 ```
 
 ## Browser globals (script tag build)

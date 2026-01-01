@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nostr-zap — tutorial test</title>
+  <meta name="description" content="Tutorial test page for nostr-zap (single zap button)." />
+
+  <link rel="icon" href="./assets/favicon.ico" sizes="48x48" />
+  <link rel="icon" href="./assets/list_alt_32dp_748499_FILL0_wght400_GRAD0_opsz40.svg" sizes="any"
+    type="image/svg+xml" />
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg2: #f8fafc;
+      --border: rgba(2, 6, 23, 0.10);
+      --text: rgba(2, 6, 23, 0.92);
+      --muted: rgba(2, 6, 23, 0.62);
+      --shadow: 0 18px 60px rgba(2, 6, 23, 0.10);
+      --radius: 14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background: linear-gradient(180deg, var(--bg), var(--bg2));
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 18px 56px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 650;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      object-fit: contain;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      display: block;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      background: rgba(2, 6, 23, 0.02);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 22px;
+      letter-spacing: -0.3px;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .mono {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid rgba(2, 6, 23, 0.18);
+      background: rgba(2, 6, 23, 0.92);
+      color: rgba(255, 255, 255, 0.96);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 650;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 140ms ease, background 140ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      background: rgba(2, 6, 23, 0.86);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .footer {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div class="brand" aria-label="nostr-zap">
+        <img class="brand-logo" src="./assets/logo.png" width="46" height="46" alt="nostr-zap" />
+        <span>nostr-zap</span>
+      </div>
+      <nav class="nav">
+        <a href="./">Demo</a>
+        <span aria-hidden="true">·</span>
+        <a href="./docs.html">Docs</a>
+      </nav>
+    </div>
+    <div class="card">
+      <h1>nostr-zap tutorial test</h1>
+      <p>
+        Click the button below to open the Zap dialog and zap this profile.
+        (This page loads the bundle from the full domain URL.)
+      </p>
+
+      <div class="mono">
+        npub: npub1tapj48eekk8lzvhupfxg4ugdgthaj97cqahk3wml97g76l20dfqspmpjyp
+      </div>
+
+      <div class="row">
+        <button
+          data-npub="npub1tapj48eekk8lzvhupfxg4ugdgthaj97cqahk3wml97g76l20dfqspmpjyp"
+          data-relays="wss://relay.nostr.band,wss://relay.damus.io,wss://nos.lol">
+          Zap
+        </button>
+      </div>
+
+      <div class="footer">
+        <div>
+          <a href="./">Demo</a>
+          <span aria-hidden="true"> · </span>
+          <a href="./docs.html">Docs</a>
+        </div>
+        <div class="mono">bundle: https://zap.nostr.buzz/dist/nostr-zap.js</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full URL (your domain) -->
+  <script src="https://zap.nostr.buzz/dist/nostr-zap.js"></script>
+</body>
+
+</html>
