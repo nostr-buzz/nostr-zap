@@ -9,22 +9,32 @@
 
   <style>
     :root {
-      /* Minimal white theme (always on) */
-      --bg: #ffffff;
-      --bg2: #f8fafc;
-      --card: rgba(2, 6, 23, 0.03);
-      --card2: rgba(2, 6, 23, 0.02);
-      --border: rgba(2, 6, 23, 0.10);
-      --text: rgba(2, 6, 23, 0.92);
-      --muted: rgba(2, 6, 23, 0.64);
-      --muted2: rgba(2, 6, 23, 0.52);
-      --accent: #111827;
-      --accent2: #0f172a;
-      --shadow: 0 18px 60px rgba(2, 6, 23, 0.10);
-      --radius: 14px;
-      --radius2: 10px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+      /* Professional minimal theme */
+      --bg: #fafbfd;
+      --bg2: #f5f7fa;
+      --card: #ffffff;
+      --border: rgba(15, 23, 42, 0.06);
+      --border-light: rgba(15, 23, 42, 0.04);
+      --text: #0f172a;
+      --text-secondary: #475569;
+      --muted: #64748b;
+      --muted2: #94a3b8;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --success: #10b981;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(15, 23, 42, 0.02);
+      --shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.04), 0 2px 4px -1px rgba(15, 23, 42, 0.02);
+      --shadow-lg: 0 20px 25px -5px rgba(15, 23, 42, 0.05), 0 10px 10px -5px rgba(15, 23, 42, 0.02);
+      --shadow-xl: 0 25px 50px -12px rgba(15, 23, 42, 0.08);
+      --radius: 16px;
+      --radius-sm: 12px;
+      --radius-lg: 20px;
+      --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      --gradient-bitcoin: linear-gradient(135deg, #f7931a 0%, #ff9d00 100%);
+      --gradient-bg: linear-gradient(180deg, #fafbfd 0%, #f9fafb 100%);
+      --mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+      --sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
     }
 
     * {
@@ -39,8 +49,11 @@
     body {
       margin: 0;
       font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       color: var(--text);
-      background: linear-gradient(180deg, var(--bg), var(--bg2));
+      background: var(--gradient-bg);
+      min-height: 100vh;
     }
 
     a {
@@ -53,118 +66,381 @@
     }
 
     .container {
-      max-width: 980px;
+      max-width: 1120px;
       margin: 0 auto;
-      padding: 28px 18px 48px;
+      padding: 48px 32px 80px;
+    }
+
+    @media (max-width: 1200px) {
+      .container {
+        padding: 40px 28px 64px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 32px 20px 48px;
+      }
     }
 
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 22px;
+      gap: 24px;
+      margin-bottom: 56px;
+      padding: 16px 0;
+    }
+
+    @media (max-width: 768px) {
+      .topbar {
+        margin-bottom: 40px;
+        padding: 12px 0;
+      }
     }
 
     .brand {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
-      font-weight: 650;
-      letter-spacing: 0.2px;
+      gap: 14px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      transition: opacity 0.2s ease;
+    }
+
+    .brand:hover {
+      opacity: 0.8;
     }
 
     .brand-logo {
-      width: 68px;
-      height: 68px;
-      border-radius: 16px;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
       object-fit: contain;
-      background: transparent;
-      border: none;
-      box-shadow: none;
+      background: var(--card);
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-sm);
       display: block;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .brand-logo:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
     }
 
     .nav {
       display: flex;
       align-items: center;
-      gap: 12px;
-      color: var(--muted);
+      gap: 24px;
+      color: var(--text-secondary);
       font-size: 14px;
+      font-weight: 500;
+    }
+
+    .nav a {
+      transition: color 0.2s ease;
+    }
+
+    .nav a:hover {
+      color: var(--accent);
+      text-decoration: none;
     }
 
     .hero {
+      position: relative;
+      background: var(--card);
       border: 1px solid var(--border);
-      background: linear-gradient(180deg, var(--card), var(--card2));
-      border-radius: var(--radius);
-      padding: 22px;
-      box-shadow: var(--shadow);
-      margin-bottom: 18px;
+      border-radius: var(--radius-lg);
+      padding: 72px 56px;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 56px;
+      overflow: hidden;
+    }
+
+    @media (max-width: 1024px) {
+      .hero {
+        padding: 56px 40px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        padding: 40px 28px;
+        margin-bottom: 40px;
+        border-radius: var(--radius);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero {
+        padding: 32px 24px;
+      }
+    }
+
+    .hero::before {
+      display: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     .hero h1 {
-      margin: 0 0 10px;
-      font-size: 34px;
+      position: relative;
+      margin: 0 0 24px;
+      font-size: 56px;
       line-height: 1.1;
-      letter-spacing: -0.6px;
+      letter-spacing: -1.6px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    @media (max-width: 1024px) {
+      .hero h1 {
+        font-size: 48px;
+        letter-spacing: -1.4px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 36px;
+        letter-spacing: -1px;
+        margin-bottom: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 {
+        font-size: 32px;
+        letter-spacing: -0.8px;
+      }
     }
 
     .hero p {
+      position: relative;
       margin: 0;
-      color: var(--muted);
       max-width: 70ch;
-      line-height: 1.55;
+      line-height: 1.7;
+    }
+
+    .emoji-xl {
+      font-size: 68px;
+      line-height: 1;
+      margin-bottom: 28px;
+      display: block;
+      opacity: 0.95;
+    }
+
+    @media (max-width: 768px) {
+      .emoji-xl {
+        font-size: 56px;
+        margin-bottom: 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .emoji-xl {
+        font-size: 48px;
+        margin-bottom: 20px;
+      }
+    }
+
+    .emoji-lg {
+      font-size: 28px;
+      line-height: 1;
+      margin-right: 8px;
+    }
+
+    .lead {
+      margin-top: 0;
+      font-size: 20px;
+      color: var(--text-secondary);
+      max-width: 75ch;
+      line-height: 1.75;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .lead {
+        font-size: 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .lead {
+        font-size: 16px;
+      }
+    }
+
+    .sublead {
+      margin-top: 18px;
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 78ch;
+    }
+
+    @media (max-width: 768px) {
+      .sublead {
+        font-size: 15px;
+        margin-top: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .sublead {
+        font-size: 14px;
+      }
     }
 
     .pillrow {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 14px;
+      gap: 10px;
+      margin-top: 24px;
     }
 
     .pill {
       border: 1px solid var(--border);
-      background: rgba(2, 6, 23, 0.02);
-      padding: 6px 10px;
+      background: var(--bg);
+      padding: 8px 14px;
       border-radius: 999px;
-      font-size: 12px;
-      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+
+    .pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
-      gap: 12px;
-      margin-top: 12px;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        gap: 12px;
+      }
+    }
+
+    .card-wide {
+      grid-column: span 12;
     }
 
     .card {
       grid-column: span 6;
       border: 1px solid var(--border);
-      background: linear-gradient(180deg, var(--card), var(--card2));
+      background: var(--card);
       border-radius: var(--radius);
-      padding: 16px;
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--border);
+    }
+
+    @media (max-width: 900px) {
+      .card {
+        grid-column: span 12;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .card {
+        padding: 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 20px;
+      }
     }
 
     .card h2 {
-      margin: 0 0 8px;
-      font-size: 16px;
-      letter-spacing: -0.2px;
+      margin: 0 0 14px;
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .card h2 {
+        font-size: 18px;
+      }
     }
 
     .card p {
-      margin: 0 0 12px;
+      margin: 0 0 18px;
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 768px) {
+      .card p {
+        font-size: 14px;
+        margin-bottom: 16px;
+      }
+    }
+
+    .steps {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--text-secondary);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .steps li {
+      margin: 8px 0;
+    }
+
+    .hint {
       color: var(--muted);
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.6;
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--bg);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
     }
 
     .row {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
       align-items: center;
+    }
+
+    @media (max-width: 480px) {
+      .row {
+        gap: 10px;
+      }
     }
 
     .theme-controls {
@@ -172,13 +448,15 @@
       align-items: center;
       gap: 8px;
       margin-left: auto;
-      padding: 6px 10px;
+      padding: 8px 12px;
       border-radius: 999px;
       border: 1px solid var(--border);
-      background: rgba(2, 6, 23, 0.02);
-      color: var(--muted);
-      font-size: 12px;
+      background: var(--card);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
       user-select: none;
+      box-shadow: var(--shadow-sm);
     }
 
     .theme-controls label {
@@ -189,17 +467,23 @@
 
     .theme-select {
       appearance: none;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid var(--border-light);
+      background: var(--bg);
       color: var(--text);
-      padding: 6px 26px 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
+      padding: 6px 28px 6px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
       cursor: pointer;
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%23020%20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>');
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>');
       background-repeat: no-repeat;
       background-position: right 8px center;
-      background-size: 16px;
+      background-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .theme-select:hover {
+      border-color: var(--border);
     }
 
     .theme-select:focus-visible {
@@ -210,48 +494,68 @@
     .btn {
       appearance: none;
       border: 1px solid var(--border);
-      background: rgba(2, 6, 23, 0.02);
+      background: var(--card);
       color: var(--text);
-      padding: 10px 12px;
-      border-radius: 12px;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
       font-weight: 600;
       font-size: 14px;
       cursor: pointer;
-      transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    @media (max-width: 480px) {
+      .btn {
+        padding: 10px 16px;
+        font-size: 13px;
+      }
     }
 
     .btn:hover {
-      transform: translateY(-1px);
-      background: rgba(2, 6, 23, 0.04);
-      border-color: rgba(2, 6, 23, 0.16);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
     .btn:active {
-      transform: translateY(0px);
+      transform: translateY(0);
     }
 
     .btn-primary {
-      border-color: rgba(2, 6, 23, 0.20);
-      background: rgba(2, 6, 23, 0.92);
-      color: rgba(255, 255, 255, 0.96);
+      border: none;
+      background: var(--gradient-primary);
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
     }
 
     .btn-primary:hover {
-      background: rgba(2, 6, 23, 0.86);
-      border-color: rgba(2, 6, 23, 0.30);
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+      transform: translateY(-2px);
+      color: white;
+      border: none;
     }
 
     .btn-green {
-      border-color: rgba(2, 6, 23, 0.16);
-      background: rgba(2, 6, 23, 0.02);
+      border: none;
+      background: var(--gradient-bitcoin);
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(247, 147, 26, 0.25);
     }
 
     .btn-green:hover {
-      background: rgba(2, 6, 23, 0.04);
-      border-color: rgba(2, 6, 23, 0.20);
+      background: linear-gradient(135deg, #e88516 0%, #f59500 100%);
+      box-shadow: 0 8px 20px rgba(247, 147, 26, 0.35);
+      transform: translateY(-2px);
+      color: white;
+      border: none;
     }
 
     .btn svg {
@@ -259,18 +563,20 @@
     }
 
     .section-title {
-      margin: 22px 0 10px;
-      font-size: 13px;
-      letter-spacing: 0.18em;
+      margin: 40px 0 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: var(--muted2);
+      color: var(--muted);
     }
 
     details {
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
-      background: rgba(2, 6, 23, 0.01);
+      background: var(--bg);
+      margin-top: 12px;
     }
 
     details summary {
@@ -300,12 +606,19 @@
 
     pre {
       margin: 0;
-      padding: 14px;
-      border-radius: var(--radius2);
-      border: 1px solid var(--border);
-      background: rgba(2, 6, 23, 0.04);
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+      background: var(--bg);
       overflow: auto;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    }
+
+    @media (max-width: 768px) {
+      pre {
+        padding: 14px;
+        font-size: 12px;
+      }
     }
 
     code {
@@ -317,45 +630,80 @@
     }
 
     .copy {
-      border-radius: 999px;
-      padding: 8px 10px;
-      font-size: 12px;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 500;
       border: 1px solid var(--border);
-      background: rgba(2, 6, 23, 0.02);
+      background: var(--card);
       color: var(--text);
       cursor: pointer;
-      transition: transform 140ms ease, background 140ms ease;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
     }
 
     .copy:hover {
       transform: translateY(-1px);
-      background: rgba(2, 6, 23, 0.04);
+      box-shadow: var(--shadow);
+      border-color: var(--accent);
     }
 
     .footer {
-      margin-top: 26px;
-      color: var(--muted);
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border-light);
+      color: var(--muted2);
       font-size: 13px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
       flex-wrap: wrap;
     }
 
     .divider {
       height: 1px;
-      background: var(--border);
-      margin: 20px 0;
+      background: var(--border-light);
+      margin: 28px 0;
     }
 
-    @media (max-width: 860px) {
-      .card {
-        grid-column: span 12;
+    @media (max-width: 768px) {
+      .section-title {
+        margin: 32px 0 16px;
+        font-size: 11px;
       }
 
-      .hero h1 {
-        font-size: 30px;
+      .nav {
+        gap: 16px;
+        font-size: 13px;
+      }
+
+      .brand-logo {
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .pillrow {
+        gap: 8px;
+      }
+
+      .pill {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+
+      .theme-controls {
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+
+      .footer {
+        font-size: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
       }
     }
   </style>
@@ -379,10 +727,12 @@
     </div>
 
     <header class="hero">
-      <h1>Embeddable zap buttons.</h1>
-      <p>
-        Minimal demo page for two experiences: a zap dialog (<code>data-npub</code>/<code>data-note-id</code>) and a
-        zap viewer (<code>data-nzv-id</code>). Drop the script, add attributes, done.
+       <h1>Accept Zaps on Your Website</h1>
+      <p class="lead">
+        Add a zap button to your site. One line of code.
+      </p>
+      <p class="sublead">
+        Simple embed. No backend. Works with any Nostr profile or note.
       </p>
       <div class="pillrow">
         <span class="pill">npub</span>
@@ -415,9 +765,42 @@
 
     <div class="section-title">Try it</div>
     <main class="grid">
+      <section class="card card-wide">
+        <h2><span class="emoji-lg" aria-hidden="true">🧭</span> Website owner checklist (recommended)</h2>
+        <p>
+          If your goal is: “I want visitors to zap me on my website”, follow these steps.
+        </p>
+        <ol class="steps">
+          <li>
+            <strong>Prepare your Nostr profile for zaps.</strong>
+            Your profile metadata should include a Lightning address / LNURL (commonly <span class="kbd">lud16</span> or <span class="kbd">lud06</span>).
+            If it’s missing, zaps cannot generate an invoice.
+          </li>
+          <li>
+            <strong>Include the script bundle</strong> (one line). See the “Embed” card below.
+          </li>
+          <li>
+            <strong>Add a Zap button</strong> using <span class="kbd">data-npub</span> (for profiles) or <span class="kbd">data-note-id</span> / <span class="kbd">data-naddr</span> (for content).
+          </li>
+          <li>
+            <strong>Pick relays</strong> (recommended: multiple read+write relays).
+            This demo uses a curated relay list.
+          </li>
+          <li>
+            <strong>Pick a theme</strong> by setting <span class="kbd">data-theme</span> to <span class="kbd">light</span> or <span class="kbd">dark</span>.
+            Use the selector on this page to try both.
+          </li>
+        </ol>
+        <div class="hint">
+          Tip: start with a profile button first. If profile zaps work, note zaps will usually work too.
+        </div>
+      </section>
+
       <section class="card">
-        <h2>Profile: zap + view</h2>
-        <p>Two buttons side-by-side: zap dialog + zap viewer for the same profile.</p>
+        <h2><span class="emoji-lg" aria-hidden="true">👤</span> Profile demo (Zap + View)</h2>
+        <p>
+          A “Zap” button to pay this profile, plus a “View” button to display recent zaps for the same profile.
+        </p>
         <div class="row">
           <button class="btn btn-green" data-npub="npub1tapj48eekk8lzvhupfxg4ugdgthaj97cqahk3wml97g76l20dfqspmpjyp"
             data-relays="wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol,wss://nostr-pub.wellorder.net,wss://relay.snort.social,wss://relay.angor.io,wss://nostr.wine,wss://eden.nostr.land,wss://nostr.bitcoiner.social,wss://nostr.mom,wss://nostr.land,wss://nostr.oxtr.dev,wss://purplepag.es,wss://offchain.pub,wss://premium.primal.net,wss://relay.mostr.pub,wss://puravida.nostr.land,wss://pyramid.fiatjaf.com,wss://atlas.nostr.land,wss://relay.nostrplebs.com,wss://hist.nostr.land,wss://no.str.cr,wss://bitcoiner.social,wss://relay.bitcoinpark.com,wss://relay.nos.social,wss://nostr.einundzwanzig.space,wss://relay.nostr.com.au,wss://nostr-01.yakihonne.com,wss://relay.noswhere.com,wss://theforest.nostr1.com,wss://yabu.me,wss://wot.nostr.party,wss://nostr-pub.semisol.dev">
@@ -441,8 +824,10 @@
       </section>
 
       <section class="card">
-        <h2>Note: zap + view</h2>
-        <p>Zap a note and instantly view all zaps for that note.</p>
+        <h2><span class="emoji-lg" aria-hidden="true">📝</span> Note demo (Zap + View)</h2>
+        <p>
+          Target a note event (nevent) and view the zaps for that exact content.
+        </p>
         <div class="row">
           <button class="btn btn-green" data-npub="npub1tapj48eekk8lzvhupfxg4ugdgthaj97cqahk3wml97g76l20dfqspmpjyp"
             data-note-id="nevent1qqs2feju0cx3mu2nm6fdq6s4lpa390v0w22ngsh7efnxe40exz2ylkcc5hm0t"
@@ -467,8 +852,11 @@
       </section>
 
       <section class="card" id="embed">
-        <h2>Embed</h2>
-        <p>Include the bundle and add the attributes to your buttons.</p>
+        <h2><span class="emoji-lg" aria-hidden="true">🧩</span> Embed (1 line)</h2>
+        <p>
+          Add this script tag near the bottom of your HTML (before <span class="kbd">&lt;/body&gt;</span>).
+          That’s it — the library auto-wires buttons by attributes.
+        </p>
 
         <details>
           <summary>Copy script tag</summary>
@@ -482,8 +870,11 @@
       </section>
 
       <section class="card">
-        <h2>Button snippet</h2>
-        <p>Minimal example of a “Zap” + “View” pair (you can style however you want).</p>
+        <h2><span class="emoji-lg" aria-hidden="true">🔘</span> Minimal button snippet</h2>
+        <p>
+          Copy/paste this into your site and replace <span class="kbd">npub1...</span> with your own identifier.
+          You can style the buttons however you want.
+        </p>
 
         <details>
           <summary>Show HTML</summary>

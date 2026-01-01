@@ -106,6 +106,24 @@
       letter-spacing: -0.6px;
     }
 
+    .emoji-xl {
+      font-size: 42px;
+      line-height: 1;
+    }
+
+    .emoji-lg {
+      font-size: 26px;
+      line-height: 1;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      max-width: 92ch;
+      line-height: 1.65;
+      font-size: 14.5px;
+    }
+
     .hero p {
       margin: 0;
       color: var(--muted);
@@ -275,6 +293,20 @@
       margin: 6px 0;
     }
 
+    .callout {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(2, 6, 23, 0.02);
+      padding: 12px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .callout strong {
+      color: var(--text);
+    }
+
     .divider {
       height: 1px;
       background: var(--border);
@@ -320,22 +352,39 @@
     </div>
 
     <header class="hero">
-      <h1>Documentation</h1>
-      <p>
-        <strong>nostr-zap</strong> provides embeddable Nostr zap UI components.
-        Two main experiences:
-        a <span class="kbd">zap viewer</span> dialog and a <span class="kbd">legacy zap</span> button flow.
-        This page is a static HTML doc (so it works on your domain without needing Markdown rendering).
+      <h1>Embed zaps on your website</h1>
+      <p class="lead">
+        This guide shows you how to add a Nostr zap button to your own website so visitors can send you zaps.
+        Everything runs in the browser: the viewer reads zap receipts from relays, and the zap flow requests invoices
+        from your profile’s zap endpoint.
       </p>
     </header>
 
     <div class="section-title" id="embed">Embed (plain HTML)</div>
     <main class="grid">
       <section class="card">
-        <h2>1) Include the bundle</h2>
+        <h2><span class="emoji-lg" aria-hidden="true">✅</span> Step 0 — Make sure you can receive zaps</h2>
         <p>
-          Add this near the end of your page. Since your site is served from
-          <span class="kbd">zap.nostr.buzz</span>, we use the <strong>full URL</strong>.
+          Before you embed anything, your Nostr profile must be “zap-ready”.
+          If the zap button cannot find a Lightning address / LNURL in your profile metadata, it can’t generate an invoice.
+        </p>
+        <div class="callout">
+          <strong>What you need:</strong> a Lightning address (often stored as <span class="kbd">lud16</span>) or an LNURL (often stored as <span class="kbd">lud06</span>) in your Nostr profile metadata (kind 0).
+          Most Nostr clients provide a field like “Lightning address” or “Zap address”.
+        </div>
+        <div class="divider"></div>
+        <h2><span class="emoji-lg" aria-hidden="true">🧠</span> Mental model (quick)</h2>
+        <ul class="list">
+          <li><strong>Zap button</strong> → looks up your profile, finds your zap endpoint, requests an invoice, then lets the user pay (WebLN or QR).</li>
+          <li><strong>Viewer button</strong> → reads zap receipts from relays and shows them in a dialog.</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2><span class="emoji-lg" aria-hidden="true">🧩</span> Step 1 — Include the bundle</h2>
+        <p>
+          Add this near the end of your page (before <span class="kbd">&lt;/body&gt;</span>).
+          We recommend using the <strong>full URL</strong> so it works anywhere.
         </p>
 
         <details open>
@@ -350,9 +399,33 @@
 
         <div class="divider"></div>
 
-        <h2>2) Add a “View zaps” button</h2>
+        <h2><span class="emoji-lg" aria-hidden="true">🔘</span> Step 2 — Add a Zap button</h2>
+        <p>
+          Add a button with <span class="kbd">data-npub</span> to target a profile.
+          Optionally provide <span class="kbd">data-relays</span> and <span class="kbd">data-theme</span>.
+        </p>
+
+        <details>
+          <summary>Zap button (profile)</summary>
+          <div class="codewrap">
+            <div class="codebar">
+              <button class="copy" type="button" data-copy>Copy</button>
+            </div>
+            <pre><code class="language-html">&lt;button
+  data-npub=&quot;npub1...&quot;
+  data-relays=&quot;wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol&quot;
+  data-theme=&quot;dark&quot;&gt;
+  ⚡️ Send a zap
+&lt;/button&gt;</code></pre>
+          </div>
+        </details>
+
+        <div class="divider"></div>
+
+        <h2><span class="emoji-lg" aria-hidden="true">👀</span> Step 3 — Add a “View zaps” button</h2>
         <p>
           The library auto-wires any <span class="kbd">button[data-nzv-id]</span> on click and opens a dialog.
+          Use it to show zaps for a profile, a note, or an addressable event.
         </p>
 
         <details>
@@ -366,24 +439,52 @@
   data-relay-urls=&quot;wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol&quot;
   data-title=&quot;&quot;
   data-zap-color-mode=&quot;true&quot;&gt;
-  View zaps
+  👀 View zaps
 &lt;/button&gt;</code></pre>
           </div>
         </details>
 
         <div class="divider"></div>
 
-        <h2>Viewer attributes</h2>
+        <h2><span class="emoji-lg" aria-hidden="true">🧷</span> Viewer attributes</h2>
         <ul class="list">
           <li><span class="kbd">data-nzv-id</span> (required): Nostr identifier (<span class="kbd">npub</span>, <span class="kbd">nprofile</span>, <span class="kbd">note</span>, <span class="kbd">nevent</span>, <span class="kbd">naddr</span>).</li>
           <li><span class="kbd">data-relay-urls</span> (required): comma-separated relay URLs.</li>
           <li><span class="kbd">data-title</span> (optional): dialog title (empty string is allowed).</li>
           <li><span class="kbd">data-zap-color-mode</span> (optional): <span class="kbd">"true"</span> or <span class="kbd">"false"</span>.</li>
+          <li><span class="kbd">data-theme</span> (optional): <span class="kbd">"light"</span> or <span class="kbd">"dark"</span>. If missing, the dialog follows the user’s system theme.</li>
         </ul>
+
+        <div class="divider"></div>
+
+        <h2><span class="emoji-lg" aria-hidden="true">🎨</span> Theming</h2>
+        <p>
+          You can force a theme per button:
+          <span class="kbd">data-theme="light"</span> or <span class="kbd">data-theme="dark"</span>.
+          If you don’t set it, the dialogs follow <span class="kbd">prefers-color-scheme</span>.
+        </p>
+
+        <details>
+          <summary>Theme examples</summary>
+          <div class="codewrap">
+            <div class="codebar">
+              <button class="copy" type="button" data-copy>Copy</button>
+            </div>
+            <pre><code class="language-html">&lt;button data-npub=&quot;npub1...&quot; data-theme=&quot;light&quot;&gt;🌞 Light zap&lt;/button&gt;
+&lt;button data-npub=&quot;npub1...&quot; data-theme=&quot;dark&quot;&gt;🌙 Dark zap&lt;/button&gt;
+
+&lt;button
+  data-nzv-id=&quot;npub1...&quot;
+  data-relay-urls=&quot;wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol&quot;
+  data-theme=&quot;dark&quot;&gt;
+  🌙 View zaps
+&lt;/button&gt;</code></pre>
+          </div>
+        </details>
       </section>
 
       <section class="card" id="reference">
-        <h2>JavaScript API (browser global)</h2>
+        <h2><span class="emoji-lg" aria-hidden="true">🧰</span> JavaScript API (browser global)</h2>
         <p>
           After you include the bundle using a <span class="kbd">&lt;script&gt;</span> tag, the library is available as
           <span class="kbd">window.nostrZap</span>.
@@ -398,7 +499,7 @@
 
         <div class="divider"></div>
 
-        <h2>Legacy zap buttons (still supported)</h2>
+        <h2><span class="emoji-lg" aria-hidden="true">🧾</span> Legacy zap buttons (still supported)</h2>
         <p>
           Older embeds remain compatible. The most common attributes are:
           <span class="kbd">data-npub</span>, <span class="kbd">data-note-id</span>, and <span class="kbd">data-relays</span>.
@@ -425,10 +526,30 @@ window.nostrZap.zapInitTargets();</code></pre>
       </section>
 
       <section class="card">
-        <h2>Try it here (live demo)</h2>
+        <h2><span class="emoji-lg" aria-hidden="true">📡</span> Relays (recommended)</h2>
         <p>
-          Want to see it working? Head back to the demo page and use the pre-wired buttons.
+          Your buttons should use multiple relays. For best results, use a mix of reliable read+write relays.
+          The demo page ships with a curated list, but you can pass your own per button.
         </p>
+        <div class="callout">
+          <strong>Zap flow:</strong> uses <span class="kbd">data-relays</span> (string).<br />
+          <strong>Viewer:</strong> uses <span class="kbd">data-relay-urls</span> (comma-separated list).
+        </div>
+
+        <div class="divider"></div>
+
+        <h2><span class="emoji-lg" aria-hidden="true">🛠️</span> Troubleshooting</h2>
+        <ul class="list">
+          <li><strong>“Unable to fetch invoice”</strong>: your profile likely has no Lightning address / LNURL in metadata, or the endpoint is unreachable.</li>
+          <li><strong>No zaps show up</strong>: try different relays (zaps may not be replicated everywhere).</li>
+          <li><strong>Theme not applied</strong>: set <span class="kbd">data-theme</span> directly on the button that opens the dialog.</li>
+          <li><strong>Payments</strong>: users with WebLN get a one-click flow; otherwise they can scan/copy the invoice QR.</li>
+        </ul>
+
+        <div class="divider"></div>
+
+        <h2><span class="emoji-lg" aria-hidden="true">🚀</span> Try it live</h2>
+        <p>See it working with pre-wired buttons and theme toggles.</p>
         <div class="row">
           <a class="btn btn-primary" href="./">Open demo</a>
         </div>
