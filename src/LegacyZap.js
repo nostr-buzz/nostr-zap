@@ -6,6 +6,7 @@ import {
   finalizeEvent,
 } from "nostr-tools";
 import { SimplePool } from "nostr-tools/pool";
+import { APP_CONFIG } from "./AppConfig.js";
 
 // ---------------------------------------------------------------------------
 // Storage (localStorage cache)
@@ -46,12 +47,9 @@ export const getProfileMetadata = async (authorId) => {
   }
 
   const pool = new SimplePool();
-  const relays = [
-    "wss://relay.nostr.band",
-    "wss://purplepag.es",
-    "wss://relay.damus.io",
-    "wss://nostr.wine",
-  ];
+  const relays = Array.isArray(APP_CONFIG?.PROFILE_CONFIG?.RELAYS)
+    ? APP_CONFIG.PROFILE_CONFIG.RELAYS
+    : [];
 
   try {
     const ev = await pool.get(relays, {
@@ -186,9 +184,10 @@ export const fetchInvoice = async ({
 
 export const listenForZapReceipt = ({ relays, invoice, onSuccess }) => {
   const pool = new SimplePool();
-  const normalizedRelays = Array.from(
-    new Set([...(relays || []), "wss://relay.nostr.band"])
-  );
+  const fallbackRelays = Array.isArray(APP_CONFIG?.PROFILE_CONFIG?.RELAYS)
+    ? APP_CONFIG.PROFILE_CONFIG.RELAYS
+    : [];
+  const normalizedRelays = Array.from(new Set([...(relays || []), ...fallbackRelays]));
   const since = Math.round(Date.now() / 1000);
 
   const subcloser = pool.subscribeMany(
@@ -465,9 +464,15 @@ const renderAmountDialog = async ({
   const truncateNip19Entity = (hex) =>
     `${hex.substring(0, 12)}...${hex.substring(hex.length - 12)}`;
 
+  const normalizeRelayUrl = (u) => (u || "").trim().replace(/\/+$/, "");
   const normalizedRelays = relays
-    ? relays.split(",")
-    : ["wss://relay.nostr.band", "wss://relay.damus.io", "wss://nos.lol"];
+    ? relays
+        .split(",")
+        .map(normalizeRelayUrl)
+        .filter(Boolean)
+    : (Array.isArray(APP_CONFIG?.PROFILE_CONFIG?.RELAYS)
+        ? APP_CONFIG.PROFILE_CONFIG.RELAYS
+        : []);
 
   const authorId = decodeNpub(npub);
   const metadataPromise = getProfileMetadata(authorId);
