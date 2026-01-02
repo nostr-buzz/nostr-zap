@@ -274,6 +274,41 @@
     </div>
   </section>
 
+  <!-- Zapwall demo (zap-to-unlock content) -->
+  <section class="px-6 pb-16 relative z-10">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex items-end justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight text-slate-900">Zapwall demo</h2>
+          <p class="mt-1 text-slate-600">Set a price per content, unlock after a successful zap.</p>
+        </div>
+      </div>
+
+      <div
+        class="rounded-[28px] border border-slate-200 bg-white shadow-xl shadow-slate-900/5 p-6 md:p-8"
+        data-zapwall
+        data-zapwall-id="demo-premium-1"
+        data-title="Premium snippet"
+        data-amount="21"
+        data-npub="npub1tapj48eekk8lzvhupfxg4ugdgthaj97cqahk3wml97g76l20dfqspmpjyp"
+        data-relays="wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol">
+
+        <div data-zapwall-content>
+          <div class="text-sm text-slate-500">Locked content preview</div>
+          <h3 class="mt-1 text-lg font-semibold text-slate-900">How zaps work (quick note)</h3>
+          <p class="mt-2 text-slate-700 leading-relaxed">
+            This is an example of content that becomes visible after a successful zap.
+            You can use this to gate posts, downloads, tutorials, or anything else.
+          </p>
+          <div class="mt-4 rounded-2xl bg-slate-50 border border-slate-200 p-4 text-sm text-slate-700">
+            <div class="font-semibold">Unlocked bonus:</div>
+            <div class="mt-1 font-mono">npub → invoice → zap receipt → unlock</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Footer -->
   <footer class="px-6 py-10 border-t border-slate-200/70 bg-white/60">
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">

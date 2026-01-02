@@ -23,6 +23,8 @@ import {
   canUseNip07,
 } from "./LegacyZap.js";
 
+import { autoInitializeZapWalls } from "./ZapWall.js";
+
 // Viewer initialization helpers
 async function initializeViewer(viewId, config) {
   const cachedEvents = cacheManager.getZapEvents(viewId);
@@ -122,6 +124,9 @@ if (typeof window !== 'undefined') {
 // Auto-wire zap buttons as well (formerly provided by the external nostr-zap script)
 autoInitializeNostrZap();
 
+// Optional: zap-to-unlock content blocks
+autoInitializeZapWalls();
+
 // Export all the modules and classes that are declared in the type definitions
 export { APP_CONFIG, ViewerConfig } from "./AppConfig.js";
 export { profilePool } from "./ProfilePool.js";
@@ -139,6 +144,9 @@ export {
   autoInitializeZapButtons,
   canUseNip07,
 };
+
+// ZapWall
+export { autoInitializeZapWalls } from "./ZapWall.js";
 
 // Public initialization API
 export function initialize(options = {}) {

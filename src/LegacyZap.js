@@ -228,6 +228,39 @@ export const listenForZapReceipt = ({ relays, invoice, onSuccess }) => {
 };
 
 // ---------------------------------------------------------------------------
+// Events (success notifications)
+// ---------------------------------------------------------------------------
+
+const emitZapSuccess = (detail) => {
+  if (typeof window === "undefined") return;
+  const safeDetail = detail && typeof detail === "object" ? detail : {};
+
+  try {
+    window.dispatchEvent(new CustomEvent("nostr-zap:success", { detail: safeDetail }));
+  } catch {
+    // Fallback for older browser environments.
+    try {
+      const ev = document.createEvent("CustomEvent");
+      ev.initCustomEvent("nostr-zap:success", false, false, safeDetail);
+      window.dispatchEvent(ev);
+    } catch {
+      // ignore
+    }
+  }
+
+  // Also emit from the originating element when provided.
+  if (safeDetail?.targetEl && safeDetail.targetEl.dispatchEvent) {
+    try {
+      safeDetail.targetEl.dispatchEvent(
+        new CustomEvent("nostr-zap:success", { detail: safeDetail, bubbles: true })
+      );
+    } catch {
+      // ignore
+    }
+  }
+};
+
+// ---------------------------------------------------------------------------
 // Legacy embedded zap dialog (UI)
 // ---------------------------------------------------------------------------
 
@@ -334,7 +367,13 @@ const showSuccessAndClose = (dialog, message = "Payment successful") => {
   }
 };
 
-const renderInvoiceDialog = ({ dialogHeader, invoice, relays, buttonColor }) => {
+const renderInvoiceDialog = ({
+  dialogHeader,
+  invoice,
+  relays,
+  buttonColor,
+  successDetail,
+}) => {
   const cachedLightningUri = getCachedLightningUri();
   const options = [
     { label: "Default Wallet", value: "lightning:" },
@@ -395,6 +434,11 @@ const renderInvoiceDialog = ({ dialogHeader, invoice, relays, buttonColor }) => 
     relays,
     invoice,
     onSuccess: () => {
+      emitZapSuccess({
+        ...(successDetail || {}),
+        invoice,
+        successSource: "receipt",
+      });
       showSuccessAndClose(invoiceDialog, "Zap received");
     },
   });
@@ -460,6 +504,11 @@ const renderAmountDialog = async ({
   relays,
   buttonColor,
   anon,
+  noteId,
+  naddr,
+  fixedAmountSats,
+  fixedAmount,
+  targetEl,
 }) => {
   const truncateNip19Entity = (hex) =>
     `${hex.substring(0, 12)}...${hex.substring(hex.length - 12)}`;
@@ -583,6 +632,32 @@ const renderAmountDialog = async ({
     amountInput.value = value;
   };
 
+  // Optional fixed amount mode (used by zapwalls / paywalled content)
+  const parsedFixedSats = Number(fixedAmountSats);
+  const isFixedAmount =
+    !!fixedAmount && Number.isFinite(parsedFixedSats) && parsedFixedSats > 0;
+  if (isFixedAmount) {
+    try {
+      presetButtonsContainer.style.display = "none";
+    } catch {
+      // ignore
+    }
+    setAmountValue(String(parsedFixedSats));
+    amountInput.readOnly = true;
+    amountInput.setAttribute("aria-readonly", "true");
+    amountInput.setAttribute("inputmode", "numeric");
+
+    // Small hint above the form
+    try {
+      form.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="fixed-amount-note">Price: <strong>${parsedFixedSats}</strong> sats</div>`
+      );
+    } catch {
+      // ignore
+    }
+  }
+
   amountDialog.addEventListener("close", function () {
     setZapButtonToDefaultState();
     form.reset();
@@ -611,7 +686,8 @@ const renderAmountDialog = async ({
     event.preventDefault();
     setZapButtonToLoadingState();
 
-    const amount = Number(amountInput.value) * 1000;
+    const amountSats = Number(amountInput.value);
+    const amount = amountSats * 1000;
     const comment = commentInput.value;
 
     try {
@@ -631,6 +707,18 @@ const renderAmountDialog = async ({
           invoice,
           relays: normalizedRelays,
           buttonColor,
+          successDetail: {
+            targetEl,
+            npub,
+            noteId,
+            naddr,
+            nip19Target,
+            relays: normalizedRelays,
+            amountSats,
+            amountMsats: amount,
+            comment,
+            anon,
+          },
         });
         const openWalletButton = invoiceDialog.querySelector(".cta-button");
 
@@ -643,6 +731,20 @@ const renderAmountDialog = async ({
         try {
           await window.webln.enable();
           await window.webln.sendPayment(invoice);
+          emitZapSuccess({
+            targetEl,
+            npub,
+            noteId,
+            naddr,
+            nip19Target,
+            relays: normalizedRelays,
+            amountSats,
+            amountMsats: amount,
+            comment,
+            anon,
+            invoice,
+            successSource: "webln",
+          });
           // WebLN paid successfully: show feedback before closing.
           setZapButtonToDefaultState();
           showSuccessAndClose(amountDialog, "Zap sent");
@@ -668,6 +770,9 @@ export const init = async ({
   cachedAmountDialog,
   buttonColor,
   anon,
+  fixedAmountSats,
+  fixedAmount,
+  targetEl,
 }) => {
   let amountDialog = cachedAmountDialog;
 
@@ -679,6 +784,11 @@ export const init = async ({
         relays,
         buttonColor,
         anon,
+        noteId,
+        naddr,
+        fixedAmountSats,
+        fixedAmount,
+        targetEl,
       });
     }
 
@@ -738,6 +848,15 @@ export const initTarget = (targetEl) => {
     const buttonColor = targetEl.getAttribute("data-button-color");
     const anon = targetEl.getAttribute("data-anon") === "true";
 
+    // Optional fixed amount mode
+    const fixedAmountSats =
+      targetEl.getAttribute("data-amount") ||
+      targetEl.getAttribute("data-amount-sats") ||
+      "";
+    const fixedAmount =
+      targetEl.getAttribute("data-fixed-amount") === "true" ||
+      targetEl.getAttribute("data-amount-fixed") === "true";
+
     if (cachedParams) {
       if (
         cachedParams.npub !== npub ||
@@ -745,13 +864,24 @@ export const initTarget = (targetEl) => {
         cachedParams.naddr !== naddr ||
         cachedParams.relays !== relays ||
         cachedParams.buttonColor !== buttonColor ||
-        cachedParams.anon !== anon
+        cachedParams.anon !== anon ||
+        cachedParams.fixedAmountSats !== fixedAmountSats ||
+        cachedParams.fixedAmount !== fixedAmount
       ) {
         cachedAmountDialog = null;
       }
     }
 
-    cachedParams = { npub, noteId, naddr, relays, buttonColor, anon };
+    cachedParams = {
+      npub,
+      noteId,
+      naddr,
+      relays,
+      buttonColor,
+      anon,
+      fixedAmountSats,
+      fixedAmount,
+    };
 
     cachedAmountDialog = await init({
       npub,
@@ -761,6 +891,9 @@ export const initTarget = (targetEl) => {
       cachedAmountDialog,
       buttonColor,
       anon,
+      fixedAmountSats,
+      fixedAmount,
+      targetEl,
     });
 
     // Extra safety: keep the page scroll position stable after opening the dialog.
@@ -1220,6 +1353,12 @@ export const injectCSS = () => {
         outline: none;
         border-color: #4FD1C5;
         box-shadow: 0 0 0 2px #4FD1C5;
+      }
+
+      .nostr-zap-dialog .fixed-amount-note {
+        margin: 10px 0 6px;
+        font-size: 13px;
+        opacity: 0.9;
       }
       @media only screen and (max-width: 480px) {
         .nostr-zap-dialog {

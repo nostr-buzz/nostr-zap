@@ -43,6 +43,34 @@ You can also target an event via `nevent`:
 </button>
 ```
 
+## Zapwall (zap-to-unlock content)
+
+You can optionally gate any HTML block behind a zap. Each content block can have its own price.
+
+Add the `data-zapwall` attributes to a container (and optionally wrap your gated content with `data-zapwall-content`).
+
+Example:
+
+```html
+<section
+  data-zapwall
+  data-zapwall-id="post-123"
+  data-title="Premium post"
+  data-amount="21"
+  data-npub="npub1..."
+  data-relays="wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol"
+  data-note-id="nevent1...">
+
+  <div data-zapwall-content>
+    <h2>Premium content</h2>
+    <p>This section is revealed after a successful zap.</p>
+  </div>
+</section>
+```
+
+Notes:
+- This is **client-side unlocking** (stored in your browser via `localStorage`). If you need true secrecy, you’ll want a server or an encrypted-content/key-delivery flow.
+- `data-note-id` / `data-naddr` are optional. If omitted, it will be a profile zap to `data-npub`.
 On page load, the library auto-wires any `button[data-nzv-id]` and opens a dialog on click.
 
 ## Zap viewer button attributes

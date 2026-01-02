@@ -50,6 +50,9 @@ declare module 'nostr-zap' {
       cachedAmountDialog?: any;
       buttonColor?: string;
       anon?: boolean;
+      fixedAmountSats?: string | number;
+      fixedAmount?: boolean;
+      targetEl?: HTMLElement;
     }): Promise<any>;
     initTarget(targetEl: HTMLElement): void;
     initTargets(selector?: string): void;
@@ -65,4 +68,7 @@ declare module 'nostr-zap' {
   export const zapInjectCSS: NostrZapApi["injectCSS"];
   export const autoInitializeZapButtons: NostrZapApi["autoInitializeZapButtons"];
   export const canUseNip07: NostrZapApi["canUseNip07"];
+
+  // --- zapwall ---
+  export function autoInitializeZapWalls(): void;
 }
