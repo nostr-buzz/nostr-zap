@@ -146,7 +146,7 @@ export {
 };
 
 // ZapWall
-export { autoInitializeZapWalls } from "./ZapWall.js";
+export { autoInitializeZapWalls, setZapWallKeyProvider } from "./ZapWall.js";
 
 // Public initialization API
 export function initialize(options = {}) {

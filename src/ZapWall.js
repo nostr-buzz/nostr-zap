@@ -8,10 +8,23 @@
 // </section>
 //
 // Notes:
-// - This is client-side gating. For true secrecy you need to deliver content from a server
-//   or encrypt + deliver the decryption key after verifying payment.
+// - There are two modes:
+//   1) "Blur" mode: content is in HTML and just visually gated (NOT secret).
+//   2) "Encrypted payload" mode: plaintext is NOT shipped; an encrypted payload is decrypted
+//      only after a successful zap AND a decryption key is provided.
+//
+// Secure mode requirements (no-server reality check):
+// - A static HTML file can ship ciphertext safely.
+// - But the decryption key must come from somewhere *other than the HTML itself*.
+//   This module supports a pluggable key provider (window/global or user-defined).
 
 const STORAGE_PREFIX = "nostrZap.zapwall.";
+
+let zapWallKeyProvider = null;
+
+export const setZapWallKeyProvider = (provider) => {
+  zapWallKeyProvider = typeof provider === "function" ? provider : null;
+};
 
 const isLocalStorageAvailable = () => {
   try {
@@ -40,6 +53,74 @@ const setStorage = (key, value) => {
 };
 
 const normalizeRelayUrl = (u) => (u || "").trim().replace(/\/+$/, "");
+
+const base64ToBytes = (b64) => {
+  if (!b64 || typeof b64 !== "string") return new Uint8Array();
+  const clean = b64.replace(/^base64:/i, "").trim();
+  const binStr = atob(clean);
+  const bytes = new Uint8Array(binStr.length);
+  for (let i = 0; i < binStr.length; i++) bytes[i] = binStr.charCodeAt(i);
+  return bytes;
+};
+
+const hexToBytes = (hex) => {
+  if (!hex || typeof hex !== "string") return new Uint8Array();
+  const clean = hex.replace(/^hex:/i, "").trim().toLowerCase();
+  if (!/^[0-9a-f]+$/.test(clean) || clean.length % 2 !== 0) return new Uint8Array();
+  const out = new Uint8Array(clean.length / 2);
+  for (let i = 0; i < out.length; i++) {
+    out[i] = parseInt(clean.slice(i * 2, i * 2 + 2), 16);
+  }
+  return out;
+};
+
+const utf8Decode = (bytes) => {
+  try {
+    return new TextDecoder("utf-8").decode(bytes);
+  } catch {
+    // Fallback
+    let s = "";
+    for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+    return s;
+  }
+};
+
+const parseKeyMaterial = (raw) => {
+  if (!raw) return null;
+  if (raw instanceof Uint8Array) return raw;
+  if (typeof raw !== "string") return null;
+
+  const trimmed = raw.trim();
+  // Heuristic: 64 hex chars => 32 bytes
+  if (/^(hex:)?[0-9a-fA-F]{64}$/.test(trimmed)) return hexToBytes(trimmed);
+  // Otherwise treat as base64
+  return base64ToBytes(trimmed);
+};
+
+const decryptAesGcm = async ({ keyBytes, ivBytes, ciphertextBytes }) => {
+  if (typeof crypto === "undefined" || !crypto.subtle) {
+    throw new Error("WebCrypto not available");
+  }
+  if (!(keyBytes instanceof Uint8Array) || keyBytes.length !== 32) {
+    throw new Error("Invalid key (expected 32 bytes)");
+  }
+  if (!(ivBytes instanceof Uint8Array) || ivBytes.length < 12) {
+    throw new Error("Invalid IV");
+  }
+  const key = await crypto.subtle.importKey(
+    "raw",
+    keyBytes,
+    { name: "AES-GCM" },
+    false,
+    ["decrypt"]
+  );
+  const pt = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: ivBytes },
+    key,
+    ciphertextBytes
+  );
+  return new Uint8Array(pt);
+};
 
 const ensureZapWallStyles = () => {
   if (typeof document === "undefined") return;
@@ -152,6 +233,23 @@ const parseZapWall = (el, index) => {
     el.querySelector("[data-zapwall-content]") ||
     el;
 
+  // Encrypted payload mode:
+  // <script type="application/json" data-zapwall-payload>{...}</script>
+  const payloadScript = el.querySelector('script[type="application/json"][data-zapwall-payload]');
+  let payload = null;
+  if (payloadScript && typeof payloadScript.textContent === "string") {
+    try {
+      payload = JSON.parse(payloadScript.textContent);
+    } catch {
+      payload = null;
+    }
+  }
+
+  const isEncrypted = !!payload;
+
+  const keyProviderMode = (el.getAttribute("data-zapwall-key-provider") || "").trim().toLowerCase();
+  const keyPromptLabel = (el.getAttribute("data-zapwall-key-label") || "Decryption key").trim();
+
   return {
     el,
     key,
@@ -162,6 +260,10 @@ const parseZapWall = (el, index) => {
     amountSats,
     title,
     contentEl,
+    payload,
+    isEncrypted,
+    keyProviderMode,
+    keyPromptLabel,
   };
 };
 
@@ -191,15 +293,79 @@ const isUnlockMatch = (wall, detail) => {
   return !!wall.npub && detail.npub === wall.npub;
 };
 
-const unlockWall = (wall, detail) => {
+const getDecryptionKey = async (wall, detail) => {
+  // 1) explicit provider set via API
+  if (typeof zapWallKeyProvider === "function") {
+    const v = await zapWallKeyProvider({ wall, zap: detail });
+    return parseKeyMaterial(v);
+  }
+
+  // 2) global provider (integrator can set window.nostrZapZapwallKeyProvider)
+  if (typeof window !== "undefined" && typeof window.nostrZapZapwallKeyProvider === "function") {
+    const v = await window.nostrZapZapwallKeyProvider({ wall, zap: detail });
+    return parseKeyMaterial(v);
+  }
+
+  // 3) optional prompt fallback (only meaningful for encrypted mode)
+  if (wall.isEncrypted) {
+    const label = wall.keyPromptLabel || "Decryption key";
+    const hinted = (wall.payload && typeof wall.payload.keyHint === "string") ? `\nHint: ${wall.payload.keyHint}` : "";
+    const entered = window.prompt(`${label} (base64 or 64-hex)${hinted}`);
+    return parseKeyMaterial(entered);
+  }
+
+  return null;
+};
+
+const unlockWall = async (wall, detail) => {
   wall.el.setAttribute("data-zapwall-unlocked", "true");
 
   // Remove overlay
   const overlay = wall.el.querySelector(":scope > .nz-zapwall-overlay");
   overlay?.remove();
 
-  // Unblur content
-  wall.contentEl.classList.remove("nz-zapwall-locked");
+  // Unlock content
+  if (wall.isEncrypted) {
+    try {
+      const payload = wall.payload;
+      const alg = (payload?.alg || "").toUpperCase();
+      if (payload?.v !== 1 || alg !== "AES-256-GCM") {
+        throw new Error("Unsupported payload format");
+      }
+      const keyBytes = await getDecryptionKey(wall, detail);
+      if (!keyBytes || keyBytes.length !== 32) {
+        throw new Error("Missing/invalid decryption key");
+      }
+      const ivBytes = base64ToBytes(payload.iv);
+      const ctBytes = base64ToBytes(payload.ct);
+      const ptBytes = await decryptAesGcm({
+        keyBytes,
+        ivBytes,
+        ciphertextBytes: ctBytes,
+      });
+      const format = (payload.format || "html").toLowerCase();
+      const plaintext = utf8Decode(ptBytes);
+      if (format === "text") {
+        wall.contentEl.textContent = plaintext;
+      } else {
+        wall.contentEl.innerHTML = plaintext;
+      }
+    } catch (e) {
+      // If decryption fails, re-lock and surface a minimal message.
+      wall.el.removeAttribute("data-zapwall-unlocked");
+      lockWall(wall);
+      try {
+        const msg = (e && e.message) ? e.message : "Decryption failed";
+        const note = wall.el.querySelector('.nz-zapwall-note');
+        if (note) note.textContent = msg;
+      } catch {
+        // ignore
+      }
+      return;
+    }
+  } else {
+    wall.contentEl.classList.remove("nz-zapwall-locked");
+  }
 
   // Persist unlock locally
   setStorage(
@@ -210,6 +376,7 @@ const unlockWall = (wall, detail) => {
       invoice: detail?.invoice || null,
       successSource: detail?.successSource || null,
       nip19Target: detail?.nip19Target || null,
+      preimage: detail?.preimage || null,
     })
   );
 };
@@ -217,8 +384,10 @@ const unlockWall = (wall, detail) => {
 const lockWall = (wall) => {
   wall.el.removeAttribute("data-zapwall-unlocked");
 
-  // Blur content (but keep layout)
-  wall.contentEl.classList.add("nz-zapwall-locked");
+  // Blur content only when plaintext is present.
+  if (!wall.isEncrypted) {
+    wall.contentEl.classList.add("nz-zapwall-locked");
+  }
 
   // Avoid duplicating overlay
   const existing = wall.el.querySelector(":scope > .nz-zapwall-overlay");
@@ -256,7 +425,9 @@ const lockWall = (wall) => {
 
   const note = document.createElement("div");
   note.className = "nz-zapwall-note";
-  note.textContent = "Unlock is stored locally in your browser.";
+  note.textContent = wall.isEncrypted
+    ? "Encrypted content: you will be asked for a decryption key after a successful zap."
+    : "Unlock is stored locally in your browser.";
 
   card.appendChild(title);
   card.appendChild(sub);

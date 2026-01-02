@@ -730,7 +730,15 @@ const renderAmountDialog = async ({
       if (window.webln) {
         try {
           await window.webln.enable();
-          await window.webln.sendPayment(invoice);
+          const payResult = await window.webln.sendPayment(invoice);
+
+          // Some WebLN providers return a payment response that may include a preimage.
+          // This is optional and wallet-dependent.
+          const preimage =
+            payResult?.preimage ||
+            payResult?.paymentPreimage ||
+            payResult?.payment_preimage ||
+            null;
           emitZapSuccess({
             targetEl,
             npub,
@@ -744,6 +752,7 @@ const renderAmountDialog = async ({
             anon,
             invoice,
             successSource: "webln",
+            preimage,
           });
           // WebLN paid successfully: show feedback before closing.
           setZapButtonToDefaultState();

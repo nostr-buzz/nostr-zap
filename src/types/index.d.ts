@@ -71,4 +71,35 @@ declare module 'nostr-zap' {
 
   // --- zapwall ---
   export function autoInitializeZapWalls(): void;
+
+  export type ZapWallSuccessDetail = {
+    npub?: string;
+    noteId?: string;
+    naddr?: string;
+    nip19Target?: string;
+    relays?: string[];
+    amountSats?: number;
+    amountMsats?: number;
+    comment?: string;
+    anon?: boolean;
+    invoice?: string;
+    successSource?: string;
+    preimage?: string | null;
+    targetEl?: HTMLElement;
+  };
+
+  export type ZapWall = {
+    key: string;
+    npub: string;
+    relayUrls: string[];
+    noteId: string;
+    naddr: string;
+    amountSats: number;
+    title: string;
+    isEncrypted: boolean;
+  };
+
+  export function setZapWallKeyProvider(
+    provider: (ctx: { wall: ZapWall; zap: ZapWallSuccessDetail }) => Promise<string | Uint8Array | null> | string | Uint8Array | null
+  ): void;
 }

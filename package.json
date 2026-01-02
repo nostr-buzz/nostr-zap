@@ -1,6 +1,6 @@
 {
   "name": "nostr-zap",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Zap any Nostr user or note from anywhere, and view zap history via embeddable buttons.",
   "main": "./dist/nostr-zap.js",
   "module": "./dist/nostr-zap.esm.js",

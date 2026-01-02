@@ -71,6 +71,55 @@ Example:
 Notes:
 - This is **client-side unlocking** (stored in your browser via `localStorage`). If you need true secrecy, you’ll want a server or an encrypted-content/key-delivery flow.
 - `data-note-id` / `data-naddr` are optional. If omitted, it will be a profile zap to `data-npub`.
+
+### Secure mode: encrypted payload (no plaintext in HTML)
+
+If you want the content to be **actually hidden** from “View Source”, do **not** put the plaintext in your HTML. Instead embed an encrypted payload and decrypt it after a successful zap.
+
+Reality check (important):
+- With *only* a static HTML file and **no** external key delivery, you cannot automatically give a secret key only to payers.
+- So this mode is secure **only if** you provide a decryption key via a secure channel (server, Nostr DM/keybot, manual delivery, etc.).
+
+1) Encrypt your content offline:
+
+The repo includes an offline helper:
+
+`scripts/zapwall-encrypt.mjs`
+
+It outputs a JSON payload plus a 32-byte key (hex). You must deliver the key to users who paid.
+
+2) Embed the payload:
+
+```html
+<section
+  data-zapwall
+  data-zapwall-id="post-locked-1"
+  data-title="Premium post"
+  data-amount="21"
+  data-npub="npub1..."
+  data-relays="wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol"
+  data-zapwall-key-label="Enter your key">
+
+  <div data-zapwall-content></div>
+
+  <script type="application/json" data-zapwall-payload>
+    {"v":1,"alg":"AES-256-GCM","iv":"...","ct":"...","format":"html"}
+  </script>
+</section>
+```
+
+3) Provide a key provider (recommended):
+
+```js
+// Option A: set a global function
+window.nostrZapZapwallKeyProvider = async ({ wall, zap }) => {
+  // Fetch key from your own secure channel.
+  // Return 32-byte key as 64-hex string or base64.
+  return null;
+};
+```
+
+If you don’t provide a provider, the default fallback is a prompt asking the user to paste a key.
 On page load, the library auto-wires any `button[data-nzv-id]` and opens a dialog on click.
 
 ## Zap viewer button attributes
