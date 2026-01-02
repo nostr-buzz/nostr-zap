@@ -454,15 +454,22 @@ class NostrZapViewDialog extends HTMLElement {
     const decoded = identifier ? safeNip19Decode(identifier) : null;
     const isNoteTarget = decoded?.type === "note" || decoded?.type === "nevent";
     if (isNoteTarget) {
-      title.href = "#";
+      title.removeAttribute("href");
       title.removeAttribute("target");
       title.removeAttribute("rel");
       title.style.cursor = "default";
     } else {
-      title.href = identifier ? `https://njump.me/${identifier}` : "#";
-      title.setAttribute("target", "_blank");
-      title.setAttribute("rel", "noreferrer");
-      title.style.cursor = "pointer";
+      if (identifier) {
+        title.href = `https://njump.me/${identifier}`;
+        title.setAttribute("target", "_blank");
+        title.setAttribute("rel", "noreferrer");
+        title.style.cursor = "pointer";
+      } else {
+        title.removeAttribute("href");
+        title.removeAttribute("target");
+        title.removeAttribute("rel");
+        title.style.cursor = "default";
+      }
     }
     
     if (effectiveCustomTitle?.trim()) {

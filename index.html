@@ -1,10 +1,33 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>nostr-zap — The easiest way to receive zaps</title>
-  <meta name="description" content="Embeddable Nostr zap button for your website." />
+  <title>nostr zap</title>
+  <meta name="description" content="Drop-in Nostr zap buttons for your website. Accept Lightning payments to your Nostr profile - no backend required." />
+  <link rel="canonical" href="https://zap.nostr.buzz/" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta name="theme-color" content="#f7931a" />
+
+  <!-- Open Graph / Social preview -->
+  <meta property="og:site_name" content="nostr-zap" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://zap.nostr.buzz/" />
+  <meta property="og:title" content="nostr-zap - Lightning zaps for your website" />
+  <meta property="og:description" content="Drop-in Nostr zap buttons for your website. Accept Lightning payments to your Nostr profile - no backend required." />
+  <meta property="og:image" content="https://zap.nostr.buzz/assets/og.svg" />
+  <meta property="og:image:type" content="image/svg+xml" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image" content="https://zap.nostr.buzz/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="nostr-zap - Lightning zaps for your website" />
+  <meta name="twitter:description" content="Drop-in Nostr zap buttons for your website. Accept Lightning payments to your Nostr profile - no backend required." />
+  <meta name="twitter:image" content="https://zap.nostr.buzz/assets/og.svg" />
+  <meta name="twitter:image:alt" content="nostr-zap - Lightning zaps for your website" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -16,11 +39,11 @@
           },
           colors: {
             brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              900: '#312e81',
+              50: '#fff7ed',
+              100: '#ffedd5',
+              500: '#f7931a',
+              600: '#f57c00',
+              900: '#7a3b00',
             }
           }
         }
@@ -31,169 +54,257 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="./assets/favicon.ico" />
-</head>
-<body class="bg-white text-slate-900 font-sans antialiased selection:bg-brand-100 selection:text-brand-900">
+  <link rel="apple-touch-icon" href="./logo.png" />
 
-  <!-- Navbar -->
-  <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-    <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-      <a href="#" class="flex items-center gap-2 font-bold text-lg tracking-tight hover:opacity-80 transition">
-        <img src="./logo.png" alt="Logo" class="w-8 h-8 rounded-lg shadow-sm">
-        <span>nostr-zap</span>
+  <!-- Structured data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "name": "nostr-zap",
+          "url": "https://zap.nostr.buzz/",
+          "logo": "https://zap.nostr.buzz/logo.png",
+          "sameAs": [
+            "https://github.com/nostr-buzz/nostr-zap"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "name": "nostr-zap",
+          "url": "https://zap.nostr.buzz/"
+        },
+        {
+          "@type": "WebPage",
+          "name": "nostr-zap - Lightning zaps for your website",
+          "url": "https://zap.nostr.buzz/",
+          "description": "Drop-in Nostr zap buttons for your website. Accept Lightning payments to your Nostr profile - no backend required."
+        }
+      ]
+    }
+  </script>
+</head>
+<body class="bg-gradient-to-b from-white via-slate-50 to-slate-100 text-slate-900 font-sans antialiased selection:bg-brand-100 selection:text-brand-900 overflow-x-hidden">
+
+  <!-- Mouse halo (Bitcoin orange) -->
+  <div id="mouse-halo" aria-hidden="true"></div>
+
+  <style>
+    /* High-quality blurred cursor halo */
+    #mouse-halo {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 460px;
+      height: 460px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+
+      /* Bitcoin orange */
+      background: radial-gradient(
+        circle at center,
+        rgba(247, 147, 26, 0.30) 0%,
+        rgba(247, 147, 26, 0.18) 25%,
+        rgba(247, 147, 26, 0.00) 68%
+      );
+
+      filter: blur(26px);
+      opacity: 0.95;
+      mix-blend-mode: multiply;
+      will-change: transform;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #mouse-halo { display: none; }
+    }
+  </style>
+
+  <!-- Top bar / nav -->
+  <nav class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl border-b border-slate-200/70">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="./index.html" class="flex items-center gap-2 font-semibold tracking-tight hover:opacity-90 transition">
+        <img src="./logo.svg" alt="nostr-zap" class="w-10 h-10 rounded-xl" />
+        <span class="hidden sm:inline">nostr-zap</span>
       </a>
-      <div class="flex items-center gap-6 text-sm font-medium text-slate-600">
-        <a href="#how-it-works" class="hover:text-brand-600 transition">How it works</a>
-        <a href="#demo" class="hover:text-brand-600 transition">Demo</a>
-        <a href="./docs.html" class="hover:text-brand-600 transition">Docs</a>
-        <a href="https://github.com/nostr-buzz/nostr-zap" target="_blank" class="text-slate-400 hover:text-slate-900 transition">
-            <!-- GitHub Icon -->
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
+      <div class="flex items-center gap-2 sm:gap-3 text-sm font-medium">
+        <a href="./tutorial-test.html" class="hidden sm:inline-flex px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 transition">
+          Tutorial
+        </a>
+        <a href="./docs.html" class="inline-flex px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 transition">
+          Docs
+        </a>
+        <a href="https://github.com/nostr-buzz/nostr-zap" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 transition">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
+          <span class="hidden sm:inline">GitHub</span>
+        </a>
+        <a href="./docs.html" class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-brand-600 text-white shadow-lg shadow-brand-500/20 hover:bg-brand-500 transition">
+          Get started
         </a>
       </div>
     </div>
   </nav>
 
   <!-- Hero -->
-  <section class="pt-32 pb-20 px-6 text-center max-w-4xl mx-auto">
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 text-brand-600 text-xs font-semibold mb-6 border border-brand-100">
-      <span>New</span>
-      <span class="w-px h-3 bg-brand-200"></span>
-      <span>v1.0 is out</span>
-    </div>
-    <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-slate-900 mb-6">
-      Receive Bitcoin Zaps <br class="hidden md:block" /> on your website.
-    </h1>
-    <p class="text-lg text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed">
-      The easiest way to monetize your content. Add a single line of code to accept Lightning payments directly to your Nostr profile. No backend required.
-    </p>
-    <div class="flex items-center justify-center gap-4">
-      <a href="#embed" class="px-6 py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-500 hover:-translate-y-0.5 transition-all shadow-lg shadow-brand-500/20">
-        Get Started
-      </a>
-      <a href="#demo" class="px-6 py-3 rounded-xl bg-white text-slate-700 font-semibold border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all">
-        Live Demo
-      </a>
-    </div>
-  </section>
+  <header class="pt-28 pb-8 sm:pt-32 sm:pb-10 px-6 relative z-10">
+    <div class="max-w-3xl mx-auto text-center">
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900">
+        Nostr zaps for your site.
+      </h1>
+      <p class="mt-3 text-base sm:text-lg text-slate-600 leading-relaxed">
+        One script. One button.
+      </p>
 
-  <!-- Features -->
-  <section id="how-it-works" class="py-20 bg-slate-50 border-y border-slate-100">
-    <div class="max-w-5xl mx-auto px-6">
-      <div class="grid md:grid-cols-3 gap-8">
-        <!-- Feature 1 -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-          <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 mb-4">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-          </div>
-          <h3 class="font-semibold text-slate-900 mb-2">Lightning Fast</h3>
-          <p class="text-sm text-slate-500 leading-relaxed">Powered by the Bitcoin Lightning Network. Instant settlements, near-zero fees.</p>
-        </div>
-        <!-- Feature 2 -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-          <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600 mb-4">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-          </div>
-          <h3 class="font-semibold text-slate-900 mb-2">One Line Embed</h3>
-          <p class="text-sm text-slate-500 leading-relaxed">Just copy and paste a script tag. No complex API integrations or backend servers needed.</p>
-        </div>
-        <!-- Feature 3 -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-          <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center text-green-600 mb-4">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          </div>
-          <h3 class="font-semibold text-slate-900 mb-2">Nostr Native</h3>
-          <p class="text-sm text-slate-500 leading-relaxed">Fully compatible with the Nostr protocol. Works with profiles (NIP-57) and events.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Demo -->
-  <section id="demo" class="py-24 px-6 max-w-5xl mx-auto">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl font-bold text-slate-900 mb-4">See it in action</h2>
-      <p class="text-slate-500">Try zapping the profile below. It's real money!</p>
-    </div>
-
-    <div class="bg-white border border-slate-200 rounded-3xl p-8 md:p-12 shadow-xl shadow-slate-200/50 flex flex-col items-center justify-center gap-8">
-      
-      <!-- Profile Card Mockup -->
-      <div class="flex flex-col items-center gap-4">
-        <img src="./logo.png" class="w-20 h-20 rounded-full border-4 border-white shadow-lg" alt="Profile">
-        <div class="text-center">
-          <h3 class="font-bold text-xl text-slate-900">Nostr Buzz</h3>
-          <p class="text-sm text-slate-500">@nostr-buzz</p>
-        </div>
-      </div>
-
-      <!-- The Buttons -->
-      <div class="flex flex-wrap justify-center gap-4">
-        <button 
-          class="px-6 py-3 rounded-full bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-all shadow-lg hover:-translate-y-0.5 flex items-center gap-2"
-          data-npub="npub1tapj48eekk8lzvhupfxg4ugdgthaj97cqahk3wml97g76l20dfqspmpjyp"
-          data-relays="wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol">
-          <span>⚡️</span> Zap Me
-        </button>
-        
-        <button 
-          class="px-6 py-3 rounded-full bg-white text-slate-700 border border-slate-200 font-semibold hover:border-brand-500 hover:text-brand-600 transition-all shadow-sm hover:-translate-y-0.5 flex items-center gap-2"
-          data-nzv-id="npub1tapj48eekk8lzvhupfxg4ugdgthaj97cqahk3wml97g76l20dfqspmpjyp"
-          data-zap-color-mode="true"
-          data-relay-urls="wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol">
-          <span>👀</span> View Zaps
-        </button>
-      </div>
-      
-      <div class="mt-4 flex items-center gap-2 text-xs text-slate-400">
-        <span>Theme:</span>
-        <select class="bg-transparent border-none p-0 font-medium text-slate-600 cursor-pointer focus:ring-0" data-theme-select>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select>
-      </div>
-    </div>
-  </section>
-
-  <!-- Embed Code -->
-  <section id="embed" class="py-20 bg-slate-900 text-white">
-    <div class="max-w-4xl mx-auto px-6">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-10">
-        <div>
-          <h2 class="text-3xl font-bold mb-2">Ready to integrate?</h2>
-          <p class="text-slate-400">Copy the snippet below and paste it into your HTML.</p>
-        </div>
-        <a href="./docs.html" class="inline-flex items-center gap-2 text-brand-400 hover:text-brand-300 font-medium transition">
-          Read full documentation <span aria-hidden="true">→</span>
+      <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="./docs.html" class="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-brand-600 text-white font-semibold shadow-lg shadow-brand-500/20 hover:bg-brand-500 transition">
+          Docs
+        </a>
+        <a href="./tutorial-test.html" class="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-white text-slate-700 font-semibold border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition">
+          Tutorial
         </a>
       </div>
+    </div>
+  </header>
 
-      <!-- Code Block -->
-      <div class="bg-slate-800 rounded-2xl p-6 border border-slate-700 shadow-2xl relative group">
-        <button class="absolute top-4 right-4 p-2 rounded-lg bg-slate-700 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-slate-600 hover:text-white" data-copy>
-          <span class="text-xs font-medium">Copy</span>
-        </button>
-        <pre class="font-mono text-sm text-slate-300 overflow-x-auto"><code>&lt;!-- 1. Include the script --&gt;
-&lt;script src="https://zap.nostr.buzz/dist/nostr-zap.js"&gt;&lt;/script&gt;
+  <!-- Embed (below hero, outside hero) -->
+  <section class="px-6 pb-10 relative z-10">
+    <div class="max-w-4xl mx-auto">
+      <div class="rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-900/5 overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200">
+          <div class="text-sm font-semibold text-slate-800">Embed</div>
+          <button class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition" data-copy>
+            Copy
+          </button>
+        </div>
+        <pre class="p-5 text-sm leading-relaxed overflow-x-auto bg-slate-900 text-slate-100"><code>&lt;script src="https://zap.nostr.buzz/dist/nostr-zap.js"&gt;&lt;/script&gt;
 
-&lt;!-- 2. Add the button --&gt;
-&lt;button 
-  data-npub="npub1..." 
-  data-relays="wss://relay.damus.io,wss://nos.lol"&gt;
-  Zap Me ⚡️
+&lt;button
+  data-npub="npub1..."
+  data-relays="wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol"&gt;
+  ⚡️ Zap me
 &lt;/button&gt;</code></pre>
+        <div class="px-5 pb-5">
+          <div class="text-xs text-slate-500">Paste before <span class="font-mono">&lt;/body&gt;</span>.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live demo -->
+  <section id="demo" class="px-6 py-12 relative z-10">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-3xl font-bold tracking-tight text-slate-900">Live demo</h2>
+          <p class="mt-1 text-slate-600">Click “Zap Me”.</p>
+        </div>
+        <div class="text-xs text-slate-500">WebLN / QR</div>
+      </div>
+
+      <div class="rounded-[28px] border border-slate-200 bg-white shadow-xl shadow-slate-900/5 overflow-visible">
+        <div class="p-7 md:p-10 grid md:grid-cols-2 gap-8 items-center">
+          <div class="flex items-center gap-4">
+            <img src="./logo.svg" class="w-16 h-16 rounded-2xl border border-slate-200 bg-white" alt="Profile" />
+            <div>
+              <div class="font-semibold text-slate-900">Nostr Buzz</div>
+              <div class="text-sm text-slate-500">npub1tapj…mpjyp</div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-4 items-stretch md:items-end">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full md:max-w-[520px] md:ml-auto">
+              <button
+                class="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 text-white font-semibold px-4 py-3 text-sm sm:text-base shadow-lg shadow-slate-900/10 hover:bg-slate-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/30"
+                data-npub="npub1tapj48eekk8lzvhupfxg4ugdgthaj97cqahk3wml97g76l20dfqspmpjyp"
+                data-relays="wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol">
+                <span class="text-base">⚡️</span>
+                <span>Zap Me</span>
+              </button>
+
+              <button
+                class="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-white text-slate-800 border border-slate-200 font-semibold px-4 py-3 text-sm sm:text-base shadow-sm hover:border-orange-400 hover:text-orange-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/40"
+                data-npub="npub1tapj48eekk8lzvhupfxg4ugdgthaj97cqahk3wml97g76l20dfqspmpjyp"
+                data-note-id="nevent1qvzqqqqqqypzqh6r920nndv07ye0czjv3tcs6sh0mytaspm0dzah7tu3a47576jpqqsdh64tahww6w58nj26qcur9wxjnzrgrf5mklfytw33m2mdyf05tessgaznd"
+                data-relays="wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol">
+                <span class="text-base">⚡️</span>
+                <span>Zap Event</span>
+              </button>
+
+              <button
+                class="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-white text-slate-800 border border-slate-200 font-semibold px-4 py-3 text-sm sm:text-base shadow-sm hover:border-brand-500 hover:text-brand-600 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/35"
+                data-nzv-id="npub1tapj48eekk8lzvhupfxg4ugdgthaj97cqahk3wml97g76l20dfqspmpjyp"
+                data-zap-color-mode="true"
+                data-relay-urls="wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol">
+                <span class="text-base">👀</span>
+                <span>View zaps</span>
+              </button>
+
+              <button
+                class="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-white text-slate-800 border border-slate-200 font-semibold px-4 py-3 text-sm sm:text-base shadow-sm hover:border-orange-400 hover:text-orange-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400/40"
+                data-nzv-id="nevent1qvzqqqqqqypzqh6r920nndv07ye0czjv3tcs6sh0mytaspm0dzah7tu3a47576jpqqsdh64tahww6w58nj26qcur9wxjnzrgrf5mklfytw33m2mdyf05tessgaznd"
+                data-title="Event"
+                data-zap-color-mode="true"
+                data-relay-urls="wss://relay.damus.io,wss://relay.primal.net,wss://nos.lol">
+                <span class="text-base">👀</span>
+                <span>View event zaps</span>
+              </button>
+            </div>
+
+            <div class="w-full flex items-center justify-end gap-2 text-xs text-slate-500">
+              <span>Theme:</span>
+              <div class="relative inline-block w-[132px]" data-theme-picker>
+                <button
+                  type="button"
+                  class="w-full inline-flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white/90 px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm hover:bg-white hover:border-slate-300 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/35"
+                  aria-haspopup="menu"
+                  aria-expanded="false"
+                  data-theme-trigger>
+                  <span data-theme-label>Light</span>
+                  <svg class="h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+
+                <div
+                  class="absolute right-0 mt-2 w-full origin-top-right rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-900/10 p-1.5 hidden z-30"
+                  role="menu"
+                  aria-label="Theme"
+                  data-theme-menu>
+                  <button type="button" role="menuitem" data-theme-option="light"
+                    class="w-full text-left px-2.5 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:bg-slate-50 transition">
+                    Light
+                  </button>
+                  <button type="button" role="menuitem" data-theme-option="dark"
+                    class="w-full text-left px-2.5 py-2 rounded-xl text-sm font-semibold text-slate-800 hover:bg-slate-50 transition">
+                    Dark
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-7 md:px-10 py-5 border-t border-slate-200 bg-slate-50 text-xs text-slate-500">
+          Tip: set <span class="font-mono">data-theme</span> to light/dark.
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="py-12 border-t border-slate-100 bg-white">
-    <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-      <div class="flex items-center gap-2 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition">
-        <img src="./logo.png" class="w-6 h-6 rounded" alt="Logo">
-        <span class="font-semibold text-sm">nostr-zap</span>
+  <footer class="px-6 py-10 border-t border-slate-200/70 bg-white/60">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div class="flex items-center gap-2">
+        <img src="./logo.svg" class="w-7 h-7 rounded-lg" alt="nostr-zap" />
+        <div>
+          <div class="font-semibold text-sm">nostr-zap</div>
+          <div class="text-xs text-slate-500">Lightning zaps for the open web</div>
+        </div>
       </div>
-      <div class="text-sm text-slate-500">
-        Open source software. Built for the <a href="https://nostr.com" target="_blank" class="underline hover:text-slate-900">Nostr</a> community.
+      <div class="flex items-center gap-4 text-sm">
+        <a href="./docs.html" class="text-slate-600 hover:text-slate-900 transition">Docs</a>
+        <a href="./tutorial-test.html" class="text-slate-600 hover:text-slate-900 transition">Tutorial</a>
+        <a href="https://github.com/nostr-buzz/nostr-zap" target="_blank" rel="noreferrer" class="text-slate-600 hover:text-slate-900 transition">GitHub</a>
       </div>
     </div>
   </footer>
@@ -201,25 +312,109 @@
   <!-- Scripts -->
   <script src="./dist/nostr-zap.js"></script>
   <script>
-    // Copy functionality
+    // Mouse halo follow
+    (function () {
+      const halo = document.getElementById('mouse-halo');
+      if (!halo) return;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      let x = window.innerWidth / 2;
+      let y = window.innerHeight / 3;
+      let tx = x;
+      let ty = y;
+      let raf = 0;
+
+      const render = () => {
+        // Smooth follow (lerp)
+        x += (tx - x) * 0.12;
+        y += (ty - y) * 0.12;
+        halo.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+        raf = requestAnimationFrame(render);
+      };
+
+      const onMove = (clientX, clientY) => {
+        tx = clientX;
+        ty = clientY;
+        if (!raf) raf = requestAnimationFrame(render);
+      };
+
+      window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY), { passive: true });
+      window.addEventListener('touchmove', (e) => {
+        const t = e.touches && e.touches[0];
+        if (!t) return;
+        onMove(t.clientX, t.clientY);
+      }, { passive: true });
+    })();
+
+    // Copy functionality (copies the code snippet in the hero card)
     document.querySelectorAll("[data-copy]").forEach((btn) => {
       btn.addEventListener("click", async () => {
-        const code = btn.parentElement.querySelector("code").innerText;
-        await navigator.clipboard.writeText(code);
-        const originalText = btn.innerText;
-        btn.querySelector("span").innerText = "Copied!";
-        setTimeout(() => btn.querySelector("span").innerText = "Copy", 2000);
+        const pre = btn.closest(".rounded-3xl")?.querySelector("pre code");
+        const text = pre?.innerText || "";
+        if (!text) return;
+
+        try {
+          await navigator.clipboard.writeText(text);
+          const prev = btn.textContent;
+          btn.textContent = "Copied";
+          setTimeout(() => (btn.textContent = prev), 1200);
+        } catch (_e) {
+          // ignore
+        }
       });
     });
 
-    // Theme switcher for demo
+    // Theme picker for demo (Tailwind-styled dropdown)
     const demoSection = document.getElementById('demo');
-    const themeSelect = document.querySelector('[data-theme-select]');
-    
-    themeSelect.addEventListener('change', (e) => {
-      const theme = e.target.value;
-      const buttons = demoSection.querySelectorAll('button[data-npub], button[data-nzv-id]');
-      buttons.forEach(btn => btn.setAttribute('data-theme', theme));
+    const themePicker = document.querySelector('[data-theme-picker]');
+    const themeTrigger = themePicker?.querySelector('[data-theme-trigger]');
+    const themeMenu = themePicker?.querySelector('[data-theme-menu]');
+    const themeLabel = themePicker?.querySelector('[data-theme-label]');
+
+    const applyTheme = (theme) => {
+      const value = (theme === 'dark') ? 'dark' : 'light';
+      const buttons = demoSection?.querySelectorAll('button[data-npub], button[data-nzv-id]') || [];
+      buttons.forEach(btn => btn.setAttribute('data-theme', value));
+      if (themeLabel) themeLabel.textContent = value === 'dark' ? 'Dark' : 'Light';
+    };
+
+    const setMenuOpen = (open) => {
+      if (!themeMenu || !themeTrigger) return;
+      themeMenu.classList.toggle('hidden', !open);
+      themeTrigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+
+    themeTrigger?.addEventListener('click', () => {
+      const isOpen = themeTrigger.getAttribute('aria-expanded') === 'true';
+      setMenuOpen(!isOpen);
+    });
+
+    themeMenu?.addEventListener('click', (e) => {
+      const btn = e.target.closest && e.target.closest('[data-theme-option]');
+      if (!btn) return;
+      applyTheme(btn.getAttribute('data-theme-option'));
+      setMenuOpen(false);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!themePicker || !themeMenu || !themeTrigger) return;
+      if (themePicker.contains(e.target)) return;
+      setMenuOpen(false);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      setMenuOpen(false);
+    });
+
+    // default
+    applyTheme('light');
+
+    // Disable hash-link scrolling (no click-to-scroll between sections).
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest && e.target.closest('a[href^="#"]');
+      if (!a) return;
+      e.preventDefault();
     });
   </script>
 </body>

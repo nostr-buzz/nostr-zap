@@ -84,7 +84,7 @@ export class DialogComponents {
   static getDialogTemplate() {
     return `
       <dialog class="dialog">
-        <h2 class="dialog-title"><a href="#" target="_blank"></a></h2>
+        <h2 class="dialog-title"><a target="_blank" rel="noreferrer"></a></h2>
         <button class="close-dialog-button" type="button" aria-label="Close">
           <svg class="close-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M6 6L18 18" />

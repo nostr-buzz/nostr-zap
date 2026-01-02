@@ -92,16 +92,21 @@ button {
   color: var(--main-text);
   font-size: medium;
   font-weight: normal;
-  max-height: 700px;
-  height: 100dvh;
   width: 360px;
-  margin: auto;
+  max-width: calc(100vw - 24px);
+  height: min(700px, calc(100dvh - 24px));
+  margin: 0;
   padding: 0;
   border: none;
   border-radius: 10px;
   background: var(--dialog-bg);
   display: flex;
   flex-direction: column;
+  /* Center in viewport (no page scrolling needed to find the dialog). */
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .dialog::backdrop {

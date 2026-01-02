@@ -4,8 +4,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>nostr-zap — tutorial test</title>
+  <title>nostr-zap - tutorial test</title>
   <meta name="description" content="Tutorial test page for nostr-zap (single zap button)." />
+  <link rel="canonical" href="https://zap.nostr.buzz/tutorial-test.html" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta name="theme-color" content="#f7931a" />
+
+  <!-- Open Graph / Social preview -->
+  <meta property="og:site_name" content="nostr-zap" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://zap.nostr.buzz/tutorial-test.html" />
+  <meta property="og:title" content="nostr-zap - tutorial test" />
+  <meta property="og:description" content="Tutorial test page for nostr-zap (single zap button)." />
+  <meta property="og:image" content="https://zap.nostr.buzz/assets/og.svg" />
+  <meta property="og:image:type" content="image/svg+xml" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image" content="https://zap.nostr.buzz/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="nostr-zap - tutorial test" />
+  <meta name="twitter:description" content="Tutorial test page for nostr-zap (single zap button)." />
+  <meta name="twitter:image" content="https://zap.nostr.buzz/assets/og.svg" />
+  <meta name="twitter:image:alt" content="nostr-zap tutorial test" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -22,13 +45,25 @@
   <link rel="icon" href="./assets/favicon.ico" sizes="48x48" />
   <link rel="icon" href="./assets/list_alt_32dp_748499_FILL0_wght400_GRAD0_opsz40.svg" sizes="any"
     type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./logo.png" />
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "nostr-zap - tutorial test",
+      "url": "https://zap.nostr.buzz/tutorial-test.html",
+      "description": "Tutorial test page for nostr-zap (single zap button)."
+    }
+  </script>
 </head>
 
 <body class="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-900 font-sans m-0">
   <div class="max-w-[860px] mx-auto px-[18px] py-[28px] pb-[56px]">
     <div class="flex items-center justify-between gap-3.5 mb-4">
       <div class="inline-flex items-center gap-2.5 font-semibold tracking-[0.2px]" aria-label="nostr-zap">
-        <img class="w-[46px] h-[46px] rounded-xl object-contain bg-transparent border-none shadow-none block" src="./assets/logo.png" width="46" height="46" alt="nostr-zap" />
+        <img class="w-[46px] h-[46px] rounded-xl object-contain bg-transparent border-none shadow-none block" src="./assets/logo.svg" width="46" height="46" alt="nostr-zap" />
         <span>nostr-zap</span>
       </div>
       <nav class="flex items-center gap-3 text-slate-500 text-sm">

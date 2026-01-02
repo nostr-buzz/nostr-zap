@@ -518,15 +518,15 @@ const renderAmountDialog = async ({
         <p class="skeleton-placeholder"></p>
       </div>
       <div class="preset-zap-options-container">
-        <button data-value="21">🌱 21 ⚡️</button>
-        <button data-value="69">😎 69 ⚡️</button>
-        <button data-value="210">✨ 210 ⚡️</button>
-        <button data-value="420">🔥 420 ⚡️</button>
-        <button data-value="1337">🚀 1337 ⚡️</button>
-        <button data-value="5000">💎 5k ⚡️</button>
-        <button data-value="10000">🐋 10k ⚡️</button>
-        <button data-value="21000">🏆 21k ⚡️</button>
-        <button data-value="1000000">👑 1M ⚡️</button>
+        <button data-value="21">🌱 21</button>
+        <button data-value="69">😎 69</button>
+        <button data-value="210">✨ 210 </button>
+        <button data-value="420">🔥 420</button>
+        <button data-value="1337">🚀 1337</button>
+        <button data-value="5000">💎 5k</button>
+        <button data-value="10000">🐋 10k</button>
+        <button data-value="21000">🏆 21k</button>
+        <button data-value="1000000">👑 1M</button>
       </div>
       <form>
         <input name="amount" type="number" placeholder="amount in sats" required />
@@ -685,7 +685,14 @@ export const init = async ({
     amountDialog.showModal();
 
     if (!window.matchMedia("(max-height: 932px)").matches) {
-      amountDialog.querySelector('input[name="amount"]').focus();
+      const amountEl = amountDialog.querySelector('input[name="amount"]');
+      // Some browsers scroll the page when focusing an element inside a <dialog>.
+      // preventScroll avoids the jump (fallback to normal focus if unsupported).
+      try {
+        amountEl?.focus({ preventScroll: true });
+      } catch {
+        amountEl?.focus();
+      }
     }
 
     return amountDialog;
@@ -702,7 +709,13 @@ export const initTarget = (targetEl) => {
   let cachedAmountDialog = null;
   let cachedParams = null;
 
-  targetEl.addEventListener("click", async function () {
+  targetEl.addEventListener("click", async function (event) {
+    const prevScrollX = window.scrollX || 0;
+    const prevScrollY = window.scrollY || 0;
+
+    // Prevent default actions that can cause the page to jump/scroll (e.g. <a href="#">,
+    // <button> inside a <form>, etc.). The zap UI is fully handled in JS.
+    if (event?.preventDefault) event.preventDefault();
     // Apply theme (data-theme="light"|"dark" on the zap button). Defaults to system.
     try {
       const explicit = (targetEl.getAttribute("data-theme") || "").toLowerCase();
@@ -749,6 +762,16 @@ export const initTarget = (targetEl) => {
       buttonColor,
       anon,
     });
+
+    // Extra safety: keep the page scroll position stable after opening the dialog.
+    // (Some browser/UA combos still jump due to focus handling.)
+    setTimeout(() => {
+      try {
+        window.scrollTo(prevScrollX, prevScrollY);
+      } catch {
+        // ignore
+      }
+    }, 0);
   });
 };
 
@@ -820,7 +843,7 @@ export const injectCSS = () => {
       .nostr-zap-dialog {
         width: 360px;
         max-width: calc(100vw - 24px);
-        margin: auto;
+        margin: 0;
         box-sizing: content-box;
         border: none;
         border-radius: 10px;
@@ -830,7 +853,13 @@ export const injectCSS = () => {
           Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
         background-color: var(--nz-dialog-bg);
         color: var(--nz-text);
-        position: relative;
+        /* Keep the modal in the viewport (no scroll-to-top needed). */
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        max-height: calc(100dvh - 24px);
+        overflow: auto;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
       }
 

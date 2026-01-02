@@ -1,10 +1,33 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Documentation — nostr-zap</title>
-  <meta name="description" content="Documentation for nostr-zap — embeddable Nostr zap buttons." />
+  <title>Documentation | nostr zap</title>
+  <meta name="description" content="Documentation for nostr-zap - embeddable Nostr zap buttons." />
+  <link rel="canonical" href="https://zap.nostr.buzz/docs.html" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta name="theme-color" content="#f7931a" />
+
+  <!-- Open Graph / Social preview -->
+  <meta property="og:site_name" content="nostr-zap" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://zap.nostr.buzz/docs.html" />
+  <meta property="og:title" content="Documentation | nostr-zap" />
+  <meta property="og:description" content="Documentation for nostr-zap - embeddable Nostr zap buttons." />
+  <meta property="og:image" content="https://zap.nostr.buzz/assets/og.svg" />
+  <meta property="og:image:type" content="image/svg+xml" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image" content="https://zap.nostr.buzz/logo.png" />
+  <meta property="og:image:type" content="image/png" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Documentation | nostr-zap" />
+  <meta name="twitter:description" content="Documentation for nostr-zap - embeddable Nostr zap buttons." />
+  <meta name="twitter:image" content="https://zap.nostr.buzz/assets/og.svg" />
+  <meta name="twitter:image:alt" content="nostr-zap documentation" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -16,11 +39,11 @@
           },
           colors: {
             brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              900: '#312e81',
+              50: '#fff7ed',
+              100: '#ffedd5',
+              500: '#f7931a',
+              600: '#f57c00',
+              900: '#7a3b00',
             }
           }
         }
@@ -31,6 +54,32 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="./assets/favicon.ico" />
+  <link rel="apple-touch-icon" href="./logo.png" />
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "name": "nostr-zap",
+          "url": "https://zap.nostr.buzz/",
+          "logo": "https://zap.nostr.buzz/logo.png",
+          "sameAs": [
+            "https://github.com/nostr-buzz/nostr-zap"
+          ]
+        },
+        {
+          "@type": "TechArticle",
+          "headline": "Documentation | nostr-zap",
+          "description": "Documentation for nostr-zap - embeddable Nostr zap buttons.",
+          "url": "https://zap.nostr.buzz/docs.html",
+          "mainEntityOfPage": "https://zap.nostr.buzz/docs.html"
+        }
+      ]
+    }
+  </script>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-brand-100 selection:text-brand-900">
 
@@ -38,12 +87,11 @@
   <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
     <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
       <a href="./index.html" class="flex items-center gap-2 font-bold text-lg tracking-tight hover:opacity-80 transition">
-        <img src="./logo.png" alt="Logo" class="w-8 h-8 rounded-lg shadow-sm">
-        <span>nostr-zap</span>
-      </a>
+        <img src="./logo.svg" alt="Logo" class="w-8 h-8 rounded-lg shadow-sm">
+       </a>
       <div class="flex items-center gap-6 text-sm font-medium text-slate-600">
-        <a href="./index.html#how-it-works" class="hover:text-brand-600 transition">How it works</a>
-        <a href="./index.html#demo" class="hover:text-brand-600 transition">Demo</a>
+        <a href="./index.html" class="hover:text-brand-600 transition">How it works</a>
+        <a href="./tutorial-test.html" class="hover:text-brand-600 transition">Demo</a>
         <a href="./docs.html" class="text-brand-600">Docs</a>
         <a href="https://github.com/nostr-buzz/nostr-zap" target="_blank" class="text-slate-400 hover:text-slate-900 transition">
             <!-- GitHub Icon -->
@@ -69,7 +117,7 @@
     <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8">
       <div class="flex items-center gap-3 mb-4">
         <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-green-50 text-green-600 text-lg">✅</span>
-        <h2 class="text-xl font-bold text-slate-900">Step 0 — Make sure you can receive zaps</h2>
+        <h2 class="text-xl font-bold text-slate-900">Step 0 - Make sure you can receive zaps</h2>
       </div>
       <p class="text-slate-600 mb-6 leading-relaxed">
         Before you embed anything, your Nostr profile must be “zap-ready”.
@@ -102,7 +150,7 @@
     <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8">
       <div class="flex items-center gap-3 mb-4">
         <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 text-lg">🧩</span>
-        <h2 class="text-xl font-bold text-slate-900">Step 1 — Include the bundle</h2>
+        <h2 class="text-xl font-bold text-slate-900">Step 1 - Include the bundle</h2>
       </div>
       <p class="text-slate-600 mb-6 leading-relaxed">
         Add this near the end of your page (before <code class="font-mono text-xs px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-slate-700">&lt;/body&gt;</code>).
@@ -123,7 +171,7 @@
     <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8">
       <div class="flex items-center gap-3 mb-4">
         <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-pink-50 text-pink-600 text-lg">🔘</span>
-        <h2 class="text-xl font-bold text-slate-900">Step 2 — Add a Zap button</h2>
+        <h2 class="text-xl font-bold text-slate-900">Step 2 - Add a Zap button</h2>
       </div>
       <p class="text-slate-600 mb-6 leading-relaxed">
         Add a button with <code class="font-mono text-xs px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-slate-700">data-npub</code> to target a profile.
@@ -149,7 +197,7 @@
     <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8">
       <div class="flex items-center gap-3 mb-4">
         <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-50 text-orange-600 text-lg">👀</span>
-        <h2 class="text-xl font-bold text-slate-900">Step 3 — Add a “View zaps” button</h2>
+        <h2 class="text-xl font-bold text-slate-900">Step 3 - Add a “View zaps” button</h2>
       </div>
       <p class="text-slate-600 mb-6 leading-relaxed">
         The library auto-wires any <code class="font-mono text-xs px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-slate-700">button[data-nzv-id]</code> on click and opens a dialog.
@@ -241,11 +289,11 @@
       <ul class="space-y-3 text-slate-600 text-sm mb-8">
         <li class="flex gap-3">
           <span class="w-1.5 h-1.5 rounded-full bg-slate-300 mt-2 shrink-0"></span>
-          <span><code class="font-mono text-xs px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-slate-700">window.nostrZap.initialize()</code> — optional manual initialization</span>
+          <span><code class="font-mono text-xs px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-slate-700">window.nostrZap.initialize()</code> - optional manual initialization</span>
         </li>
         <li class="flex gap-3">
           <span class="w-1.5 h-1.5 rounded-full bg-slate-300 mt-2 shrink-0"></span>
-          <span><code class="font-mono text-xs px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-slate-700">window.nostrZap.nostrZapView()</code> — open the zap viewer dialog</span>
+          <span><code class="font-mono text-xs px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-slate-700">window.nostrZap.nostrZapView()</code> - open the zap viewer dialog</span>
         </li>
       </ul>
 
@@ -324,7 +372,7 @@ window.nostrZap.zapInitTargets();</code></pre>
   <footer class="bg-slate-900 text-slate-400 py-12">
     <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
       <div class="flex items-center gap-2">
-        <img src="./logo.png" alt="Logo" class="w-6 h-6 rounded opacity-80 grayscale">
+        <img src="./logo.svg" alt="Logo" class="w-6 h-6 rounded opacity-80 grayscale">
         <span class="font-semibold text-slate-200">nostr-zap</span>
       </div>
       <div class="text-sm">
@@ -356,6 +404,13 @@ window.nostrZap.zapInitTargets();</code></pre>
           // ignore clipboard failures
         }
       });
+    });
+
+    // Disable hash-link scrolling (no click-to-scroll between sections).
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest && e.target.closest('a[href^="#"]');
+      if (!a) return;
+      e.preventDefault();
     });
   </script>
 </body>
